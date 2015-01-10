@@ -16,20 +16,20 @@
 		</tr>	
 		<tr>
 			<td>Merit position</td>
-			<td>{{ $result->merit_position }}</td>
+			<td>NA</td>
 		</tr>
 		<tr>
 			<td>Admission test score</td>
-			<td>{{ $result->score }}</td>
+			<td>NA</td>
 		</tr>
 		<tr>
 			<td>Total score</td>
-			<td>{{ $result->total_score }}</td>
-		</tr>
+			<td>NA</td>
+		</tr>	
 		<tr>
-			<td>Quota</td>
-			<td>{{ !empty($examinee->quota) ?  $examinee->quota: "N/A" }}</td>
-		</tr>		
+			<td>Result</td>
+			<td><span style="color: red;">Failed</span></td>
+		</tr>	
 	</tbody>
 </table>
 </div>

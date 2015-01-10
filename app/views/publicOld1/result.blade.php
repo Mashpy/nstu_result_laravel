@@ -7,7 +7,6 @@
 @section('menu_items')
 	<li class="active"><a href="/">View result</a></li>
 	<li><a href="/downloads">Result download</a></li>	
-	<li><a href="/instructions">Instructions</a></li>
 @stop
 
 @section('contents')
@@ -18,14 +17,6 @@
 				if(!empty($show_publication_summary))
 				{
 					echo View::make('public.result_publication_summary');
-				}				
-			?>
-            
-            <?php
-				$has_notice = Settings::GetSettings('has_notice');
-				if(!empty($has_notice))
-				{
-					echo View::make('public.notice');
 				}				
 			?>
 

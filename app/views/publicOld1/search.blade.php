@@ -7,7 +7,6 @@
 @section('menu_items')
 	<li><a href="/result">View result</a></li>
 	<li><a href="/downloads">Result download</a></li>	
-	<li><a href="/instructions">Instructions</a></li>
 @stop
 
 @section('contents')

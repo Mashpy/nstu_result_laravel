@@ -5,7 +5,7 @@
 		</div>
 		<div style="" id="collapse_result_details" class="panel-collapse collapse">
 			<div class="panel-body">
-				<table class="table" style="margin-bottom: 0px;">
+				<table class="table">
 					<thead>
 						<tr>
 							<th>Subject</th>

@@ -42,5 +42,10 @@ Route::get('/search/{keyword}', function($keyword)
 
 Route::post('/search', 'SearchController@search');
 
+Route::get('/instructions', function()
+{
+	return View::make('public.instructions');
+});
+
 ?>
 

@@ -25,10 +25,6 @@
 		<tr>
 			<td>Total score</td>
 			<td>{{ $result->total_score }}</td>
-		</tr>
-		<tr>
-			<td>Quota</td>
-			<td>{{ !empty($examinee->quota) ?  $examinee->quota: "N/A" }}</td>
 		</tr>		
 	</tbody>
 </table>

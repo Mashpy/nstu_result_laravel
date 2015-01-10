@@ -57,7 +57,7 @@ return array(
 			'host'      => 'localhost',
 			'database'  => 'nsturesult',
 			'username'  => 'root',
-			'password'  => '',
+			'password'  => 'Tawhid#4321',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

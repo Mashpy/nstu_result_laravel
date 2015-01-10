@@ -1,6 +1,6 @@
 <form action="/result" method="post" onsubmit="return validateSearchForm(this);"> 
 	<div class="input-group form-search">
-		<input id="search_by_roll" class="form-control search-query" name="roll" value="{{ isset($roll) ? $roll : ''; }}"> 
+		<input placeholder="Search by exam roll" id="search_by_roll" class="form-control search-query" name="roll" value="{{ isset($roll) ? $roll : ''; }}"> 
 		<span class="input-group-btn">
 			<button type="submit" class="btn btn-primary" data-type="last">View result</button>
 		</span>
@@ -71,6 +71,8 @@
 	$passed = false;
 	$show_result_details = false;
 	$show_failers_details = false;
+	$result = null;
+	$show_examinee_details = true;
 
 	if (!empty($examinee))
 	{
@@ -106,104 +108,138 @@
 <?php
 	if(isset($examinee) and !empty($is_result_published))
 	{
-		$exam_roll = $examinee->exam_roll;
-		$result = DB::table('results')->where('exam_roll', $exam_roll)->first();
-
-		if($result)
+		if($unit=="D")
 		{
-			$show_result_details = Settings::GetSettings('show_result_details');
-			$show_failers_details = Settings::GetSettings('show_failers_details');
+			echo '
+			<div id="alert_search_disabled_for_D" class="alert alert-danger alert-dismissable"  style="margin-top: 10px;">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+				<h4>Notice for D unit!</h4>
+				<p>
+					The result of D unit has been published, but our search option is not ready yet. Please download the result of D unit from 
+					<a href="/downloads" class="alert-link">Downloads</a> page.
+				</p>
+			</div>';
 
-			$list = $result->list;
-			$merit_position = $result->merit_position;
-			if(!empty($merit_position))
+			$show_examinee_details = false;
+		}
+		else
+		{
+			$exam_roll = $examinee->exam_roll;
+			$result = DB::table('results')->where('exam_roll', $exam_roll)->first();
+
+			if($result)
 			{
-				switch($list)
+				$show_result_details = Settings::GetSettings('show_result_details');
+				$show_failers_details = Settings::GetSettings('show_failers_details');
+
+				$list = $result->list;
+				$merit_position = $result->merit_position;
+				$cum_merit = $result->cumulative_merit_position;
+
+				if(!empty($merit_position))
 				{
-					case "Merit":
-						$merit_seats = $unit_info->merit_seats;
-						$cong_text = 'Your merit position is '.$merit_position.'.';
-						if($merit_position > $merit_seats)
-						{
-							$cong_text .= ' You are at position '.($merit_position-$merit_seats).' of waiting list.';
-						}
-						else
-						{
-							$cong_text .= ' You are in the main merit list.';
-						}
-						echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';			
-						echo '<h4>Congratulation! You are in the merit list.</h4>';
-						echo '<p>'.$cong_text.'</p>';
-						echo '</div>';
+					switch($list)
+					{
+						case "Merit":
+							$merit_seats = $unit_info->merit_seats;
+							$cong_text = 'Your merit position is '.$merit_position.'.';
+							if($merit_position > $merit_seats)
+							{
+								$cong_text .= ' You are at position '.($merit_position-$merit_seats).' of waiting list.';
+							}
+							else
+							{
+								$cong_text .= ' You are in the main merit list.';
+							}
+							echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';			
+							echo '<h4>Congratulation! You are in the merit list.</h4>';
+							echo '<p>'.$cong_text.'</p>';
+							echo '<a class="btn btn-primary" href="/instructions">See the instructions</a>';
+							echo '</div>';
 
-						$passed = true;
-						break;
-					case "FFQ":
-					case "FF":
-						$ff_seats = $unit_info->ff_seats;
-						$cong_text = 'Your merit position is '.$merit_position.'.';
-						if($merit_position > $ff_seats)
-						{
-							$cong_text .= ' You are at position '.($merit_position-$ff_seats).' of waiting list.';
-						}
-						else
-						{
-							$cong_text = ' You are in the main merit list.';
-						}
-						echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';			
-						echo '<h4>Congratulation! You are selected in Freedom Fighter quota.</h4>';
-						echo '<p>'.$cong_text.'</p>';
-						echo '</div>';
+							$passed = true;
+							break;
+						case "FFQ":
+						case "FF":
+							$ff_seats = $unit_info->ff_seats;
+							$cong_text = 'Your merit position (in quota) is '.$merit_position.'.';
+							if($merit_position > $ff_seats)
+							{
+								$cong_text .= ' You are at position '.($merit_position-$ff_seats).' of waiting list.';
+							}
+							else
+							{
+								$cong_text .= ' You are in the main merit list.';
+							}
+							
+							if(!empty($cum_merit) and is_numeric($cum_merit))
+							{
+								$cong_text .= ' Your cumulative merit position is '.$cum_merit.'.';
+							}
 
-						$passed = true;
-						break;
-					case "Tribal":
-					case "TQ":
-						$tribal_seats = $unit_info->tribal_seats;
-						$cong_text = 'Your merit position is '.$merit_position.'.';
-						if($merit_position > $tribal_seats)
-						{
-							$cong_text .= ' You are at position '.($merit_position-$tribal_seats).' of waiting list.';
-						}
-						else
-						{
-							$cong_text = ' You are in the main merit list.';
-						}
-						echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';		
-						echo '<h4>Congratulation! You are selected in Tribal quota.</h4>';
-						echo '<p>'.$cong_text.'</p>';
-						echo '</div>';
+							echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';			
+							echo '<h4>Congratulation! You are selected in Freedom Fighter quota.</h4>';
+							echo '<p>'.$cong_text.'</p>';
+							echo '<a class="btn btn-primary" href="/instructions">See the instructions</a>';
+							echo '</div>';
 
-						$passed = true;
-						break;
-					default:
-						echo '<div id="alert_failed" class="alert alert-danger"  style="margin-top: 10px;">';			
-						echo '<h4>Sorry, you have failed.</h4>';
-						echo '<p>You have not passed the admission test.';						
-						if(empty($show_result_details) or empty($show_failers_details))
-						{
-							echo ' Futher details are not available.';
-						}
-						echo '</p>';
-						echo '</div>';
-						break;
+							$passed = true;
+							break;
+						case "Tribal":
+						case "TQ":
+							$tribal_seats = $unit_info->tribal_seats;
+							$cong_text = 'Your merit position (in quota) is '.$merit_position.'.';
+							if($merit_position > $tribal_seats)
+							{
+								$cong_text .= ' You are at position '.($merit_position-$tribal_seats).' of waiting list.';
+							}
+							else
+							{
+								$cong_text .= ' You are in the main merit list.';
+							}
+
+							if(!empty($cum_merit) and is_numeric($cum_merit))
+							{
+								$cong_text .= ' Your cumulative merit position is '.$cum_merit.'.';
+							}
+
+							echo '<div id="alert_passed" class="alert alert-info"  style="margin-top: 10px;">';		
+							echo '<h4>Congratulation! You are selected in Tribal quota.</h4>';
+							echo '<p>'.$cong_text.'</p>';
+							echo '<a class="btn btn-primary" href="/instructions">See the instructions</a>';
+							echo '</div>';
+
+							$passed = true;
+							break;
+						default:
+							echo '<div id="alert_failed" class="alert alert-danger"  style="margin-top: 10px;">';			
+							echo '<h4>Sorry, you have failed.</h4>';
+							echo '<p>You have not passed the admission test.';						
+							if(empty($show_result_details) or empty($show_failers_details))
+							{
+								echo ' Futher details are not available.';
+							}
+							echo '</p>';
+							echo '</div>';
+							break;
+					}
+				}
+				else 
+				{
+					echo '<div id="alert_failed" class="alert alert-danger"  style="margin-top: 10px;">';			
+					echo '<h4>Sorry, you have failed.</h4>';
+					echo '<p>You have not passed the admission test. Futher details are not available.</p>';
+					echo '</div>';
 				}
 			}
-			else 
+			else
 			{
 				echo '<div id="alert_failed" class="alert alert-danger"  style="margin-top: 10px;">';			
 				echo '<h4>Sorry, you have failed.</h4>';
 				echo '<p>You have not passed the admission test. Futher details are not available.</p>';
 				echo '</div>';
 			}
-		}
-		else
-		{
-			echo '<div id="alert_failed" class="alert alert-danger"  style="margin-top: 10px;">';			
-			echo '<h4>Sorry, you have failed.</h4>';
-			echo '<p>You have not passed the admission test. Futher details are not available.</p>';
-			echo '</div>';
-		}
+		}		
 	}	
 ?>
 
@@ -212,14 +248,23 @@
 	{
 		if(empty($result))
 		{
-			echo View::make('public.result_summary_failed')->with('examinee', $examinee)->with('result', $result);	
+			if ($show_examinee_details)
+			{
+				echo View::make('public.result_summary_failed')->with('examinee', $examinee)->with('result', $result);	
+			}			
 		}
 		else
 		{
-			echo View::make('public.result_summary')->with('examinee', $examinee)->with('result', $result);	
-		}		
+			if ($show_examinee_details)
+			{
+				echo View::make('public.result_summary')->with('examinee', $examinee)->with('result', $result);	
+			}
+		}	
 
-		echo View::make('public.examinee_details')->with('examinee', $examinee);
+		if($show_examinee_details)
+		{
+			echo View::make('public.examinee_details')->with('examinee', $examinee);
+		}		
 
 		if($show_result_details)
 		{
